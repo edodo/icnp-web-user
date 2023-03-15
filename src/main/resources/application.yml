@@ -1,0 +1,73 @@
+## Server Config ##
+server:
+  port: 8080
+
+## Spring Config ##
+spring:
+  ### 어플리케이션 이름 ###
+  application:
+    name: web-user
+  ### 데이터 소스 ###
+  # slave/ master(R/W) DB 분리 설정
+  datasource:
+    hikari:
+      master: # CUD 전용 - Service에 @Transactional
+        driver-class-name: org.postgresql.Driver
+        #jdbc-url: jdbc:postgresql://220.86.29.33:35432/test_db
+        jdbc-url: jdbc:postgresql://172.30.10.26:5432/test_db
+        read-only: false
+        username: insoft
+        password: insoft!23
+      slave: # 읽기전용 - Service에 @Transactional(readOnly = true)
+        driver-class-name: org.postgresql.Driver
+        #jdbc-url: jdbc:postgresql://220.86.29.33:35432/test_db
+        jdbc-url: jdbc:postgresql://172.30.10.26:5432/test_db
+        read-only: true
+        username: insoft
+        password: insoft!23
+
+#   스프링 부트 기동시  src/main/srsources/schema.sql 을 항상 수행하는 설정(한번만 설정하고 주석처리)
+#  sql:
+#    init:
+#      mode: always
+  thymeleaf:
+    cache: false
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+### MyBatis 설정 ###
+mybatis:
+  mapperLocations: mybatis/user/mapper/**/*.xml
+  configLocations: mybatis/mybatis-config.xml
+#  #column name to camel case - 반환 받는 컬럼명을 CamelCase로 받는 설정을 합니다.
+#  configuration:
+#    map-underscore-to-camel-case: true
+### feign client 설정 ###
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:        # 별도 feign client에 이름을 지정하지 않고 default로 지정해서 모든 클라이언트에 동일한 속성 사용
+        connect-timeout: 30000  # connection try timeout 설정 30초
+        read-timeout: 30000   # connection read timeout(최대 작업 시간) 설정 30초
+#      another:  # FeignClient name
+#        request-interceptors:
+#          - io.github.yearnlune.feign.example.feign.FeignHeaderInterceptor
+#        error-decoder: io.github.yearnlune.feign.example.feign.FeignErrorDecoder
+#        logger-level: FULL
+  url:
+    #product: http://localhost:8000/api/v1/products
+    product: http://cloud-arch-service-icnp-web-gateway-prd.cloud-arch.svc.cluster01.icnp.private:8000/api/v1/products
+# swagger-ui custom path
+springdoc:
+  swagger-ui:
+    path: /users/swagger-ui.html
+    operations-sorter: alpha
+  api-docs:
+    path: /users/v3/api-docs
+## logging ( TRACE < DEBUG < INFO < WARN < ERROR ) ###
+logging:
+  config: classpath:log4j2/log4j2.xml
+  root: INFO

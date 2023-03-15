@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" packages="icnp.config">
+<!--
+1. 로그 표현 형식 표준화
+[날짜] [level::로그레벨] [thread::thread] [class::클래스명:라인수] - message
+ex)
+2022-09-22 14:45:23.665 [level::INFO ] [thread::http-nio-8080-exec-1] [class::MainController:17] [app_name::admin-chsis-ui] - application message
+2. 로그 파일 1시간 단위 롤링 => (vm인경우 옵션으로 하기 컨테이너에서는 빼기)
+3. 로그파일 로그레벨별 분리 저장. =>  (vm인경우 옵션으로 하기 컨테이너에서는 빼기)
+-->
+    <Properties>
+        <Property name="logNm">icnp-web-user</Property>
+        <Property name="layoutPattern">[%style{%d{yyyy-MM-dd HH:mm:ss,SSS}}{cyan}] %highlight{[%-5p]}{FATAL=bg_red, ERROR=red,
+            WARN=yellow, INFO=green, DEBUG=blue} %style{[%t]}{yellow} [%class(%F:%L)] %m%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console_Appender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${layoutPattern}"/>
+        </Console>
+        <RollingFile name="File_Appender" fileName="logs/${logNm}.log" filePattern="logs/${logNm}_%d{yyyy-MM-dd}_%i.log.gz">
+            <PatternLayout pattern="${layoutPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1000KB"/>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" fileIndex="min"/>
+        </RollingFile>
+        <!--IcnpAppender name="IcnpAppender">
+            <PatternLayout pattern="${layoutPattern}"/>
+        </IcnpAppender-->
+    </Appenders>
+    <Loggers>
+        <Root level="DEBUG" additivity="false">
+            <AppenderRef ref="Console_Appender"/>
+            <AppenderRef ref="File_Appender"/>
+        </Root>
+        <!--Root level="DEBUG">
+            <AppenderRef ref="IcnpAppender" />
+        </Root-->
+        <Logger name="org.springframework" level="INFO" additivity="false">
+            <AppenderRef ref="Console_Appender" />
+            <AppenderRef ref="File_Appender"/>
+        </Logger>
+        <!--하단 name에 본인이 사용하는 package명으로 수정할 것-->
+        <!--Logger name="org.springframework" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console_Appender" />
+        </Logger-->
+    </Loggers>
+</Configuration>

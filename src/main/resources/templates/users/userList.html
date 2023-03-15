@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+    <!-- 로그인 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function dataSend(userId) {
+            console.log(userId);
+            $.ajax({
+                url : "/api/v1/users/"+userId,
+                type : "DELETE",
+                contentType : "application/json",
+                dataType : "json",
+                success : function(data) {
+                    console.log(data);
+                    alert("삭제 성공!");
+                    location.href = "/users/list/screen";
+                },
+                error : function(data) {
+                    console.log(data);
+                    alert("삭제 실패!");
+                }
+            });
+        };
+    </script>
+</head>
+<body>
+> <a href="/users/index/screen">메인</a>
+<h2 class="mt-3 mb-3">회원 리스트</h2>
+
+<table>
+    <thead></thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.userId}"></td>
+        <td th:text="${user.userName}"></td>
+        <td th:text="${user.userEmail}"></td>
+        <td th:text="${user.userPassword}"></td>
+        <td><a th:href="@{/users/products/{id}/screen(id=${user.userId})}">사용자상품</a></td>
+        <td> <button ctype="button" id="deleteUser" th:onclick="dataSend([[${user.userId}]])" >삭제</button> </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
